@@ -53,6 +53,7 @@ module.exports = {
         curly                              : ['error', 'all'],
         'no-else-return'                   : 'error',
         'no-lonely-if'                     : 'error',
+        'max-params'                       : ['warn', 5],
         'import/no-named-as-default'       : 'off',
         'import/no-extraneous-dependencies': 'off',
         'import/prefer-default-export'     : 'off',

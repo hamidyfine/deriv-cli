@@ -1,10 +1,11 @@
 import commander from 'commander';
-import commandName from './commands/command-name';
+import { branch, config } from './commands';
 import { name, version } from '../package.json';
 
 const program = new commander.Command();
 
-commandName(program);
+config(program);
+branch(program);
 
 program.name(name);
 program.version(version);

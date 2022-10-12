@@ -42,8 +42,11 @@
         "typescript": "^4.7.2"
     },
     "dependencies": {
+        "axios": "^1.1.2",
         "chalk": "^4.1.2",
+        "change-case": "^4.1.2",
         "commander": "^9.3.0",
-        "inquirer": "^8.2.4"
+        "enquirer": "^2.3.6",
+        "fs-pro": "^3.12.0"
     }
 }
