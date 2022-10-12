@@ -3,7 +3,7 @@
 /* -------------------------------------------------------------------------- */
 import { api, exec } from '../utils';
 import { read_config } from './config';
-import { paramCase } from 'change-case';
+import { snakeCase } from 'change-case';
 import chalk from 'chalk';
 
 export const branch = (program: any) => {
@@ -26,7 +26,7 @@ export const branch = (program: any) => {
                 } else {
                     const issue_data = {
                         number: issue.data.issue.id,
-                        title : paramCase(issue.data.issue.subject),
+                        title : snakeCase(issue.data.issue.subject),
                         name  : read_config('login'),
                     };
                     const { stdout, stderr } = await exec(
