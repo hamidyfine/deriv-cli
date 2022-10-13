@@ -24,7 +24,8 @@ export const branch = (program: any) => {
                     console.log(chalk.red(issue.error));
                     process.exit(1);
                 } else {
-                    const filter_title = issue.data.issue.subject.replace(/Developer_name/gi, '').replace(/Task/gi, '');
+                    const filter_title = issue.data.issue.subject.substring(issue.data.issue.subject.indexOf('/') + 1).replace(/-/gi, ' ').replace(/Developer_name/gi, '').replace(/Task/gi, '');
+                    console.log('🚀 ~ file: branch.ts ~ line 28 ~ filter_title', filter_title);
                     const issue_data = {
                         number: issue.data.issue.id,
                         title : snakeCase(filter_title),
