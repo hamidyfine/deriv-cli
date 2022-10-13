@@ -24,9 +24,10 @@ export const branch = (program: any) => {
                     console.log(chalk.red(issue.error));
                     process.exit(1);
                 } else {
+                    const filter_title = issue.data.issue.subject.replace(/Developer_name/gi, '').replace(/Task/gi, '');
                     const issue_data = {
                         number: issue.data.issue.id,
-                        title : snakeCase(issue.data.issue.subject),
+                        title : snakeCase(filter_title),
                         name  : read_config('login'),
                     };
                     const { stdout, stderr } = await exec(
