@@ -18,9 +18,9 @@
         "url": "git+https://github.com/hamid-deriv/jarvis"
     },
     "keywords": [
-        "boilerplate",
         "typescript",
-        "cli"
+        "cli",
+        "deriv"
     ],
     "author": "hamid-deriv",
     "license": "MIT",
