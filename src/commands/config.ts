@@ -5,7 +5,7 @@ import axios from 'axios';
 import { homedir } from 'os';
 import { prompt } from 'enquirer';
 import { File } from 'fs-pro';
-import chalk from 'chalk';
+import { alert } from '../utils';
 
 interface TResponse {
     token: string;
@@ -58,6 +58,6 @@ export const config = (program: any) => {
                 mail     : my_account.data.user.mail,
             };
             file.write(JSON.stringify(content));
-            console.log(chalk.green('Jarvis configured successfully.'));
+            alert('Jarvis configured successfully.', 'green');
         });
 };
