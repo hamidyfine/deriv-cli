@@ -25,7 +25,7 @@ export const api = async (url: string, method?: string, params?: unknown, header
         return res;
     } catch (error: any) {
         return {
-            error: error.request.res.statusMessage,
+            error: error.request?.res?.statusMessage,
         };
     }
 };
