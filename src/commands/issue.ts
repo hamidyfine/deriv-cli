@@ -124,7 +124,6 @@ const add_vote = async (options: any, issue: TIssue) => {
 const review_pr = async (options: any, issue: TIssue) => {
     const desc = issue.data.issue.description;
     const pr_link = desc.substring(desc.indexOf('https://github.com/binary-com/deriv-app/pull/'), desc.indexOf(']'));
-    console.log('🚀 ~ file: issue.ts ~ line 127 ~ pr_link', pr_link);
 
     const review = async () => {
         alert(`PR Link: ${pr_link}`, 'blue');
