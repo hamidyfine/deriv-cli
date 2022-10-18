@@ -45,6 +45,7 @@
         "axios": "^1.1.2",
         "chalk": "^4.1.2",
         "change-case": "^4.1.2",
+        "cli-table3": "^0.6.3",
         "commander": "^9.3.0",
         "enquirer": "^2.3.6",
         "fs-pro": "^3.12.0",

@@ -3,7 +3,8 @@
 /* -------------------------------------------------------------------------- */
 import { prompt } from 'enquirer';
 import open from 'open';
-import { fetch_issue, update_issue, find_in_journals, find_in_custom_fields } from '../utils/issue';
+import Table from 'cli-table3';
+import { fetch_issue, update_issue, find_in_journals, find_in_custom_fields, user_issues } from '../utils/issue';
 import { read_config } from './config';
 import type { TIssue } from '../types/issue.types';
 import { alert } from '../utils';
@@ -34,6 +35,27 @@ const add_vote_confirm = {
 };
 
 // Actions
+const my_issues = async () => {
+    const issues: TIssue = await user_issues(read_config('id'), 'open');
+    let table = new Table({
+        head     : ['Number', 'Project', 'Tracker', 'Subject', 'Status', 'S. Hours', '# Votes'],
+        colWidths: [8, 15, 8, 70, 15, 12, 12],
+        style    : {
+            compact: false,
+        },
+    });
+    await issues.data.issues.forEach(async (issue: TIssue) => {
+        const votes = await find_in_custom_fields(issue.custom_fields, 'Votes');
+        table.push(
+            [issue.id, issue.project.name, issue.tracker.name, issue.subject, issue.status.name, issue.total_spent_hours, votes.value.length],
+        );
+    });
+    // @ts-ignore
+    const sort_table = table.sort((a,b) => (a[4] > b[4]) ? 1 : ((b[4] > a[4]) ? -1 : 0));
+    console.log();
+    console.log(sort_table.toString());
+};
+
 const start_issue = async (options: any, issue: TIssue) => {
     const story_sprint = await find_in_journals(issue.data.issue.journals, 'agile_sprint');
     const story_point = await find_in_journals(issue.data.issue.journals, 'story_points');
@@ -129,20 +151,80 @@ const review_pr = async (options: any, issue: TIssue) => {
     }
 };
 
+const check_for_qa = async () => {
+    const ready_issues: TIssue[] = [];
+    const issues: TIssue = await user_issues(read_config('id'), 'open');
+    let table = new Table({
+        head: ['Number', 'Subject', 'Status', 'Number of Votes'],
+    });
+
+    await issues.data.issues.forEach(async (issue: TIssue) => {
+        const votes = await find_in_custom_fields(issue.custom_fields, 'Votes');
+        if (issue.status.name.toLowerCase() === 'needs review') {
+            table.push(
+                [issue.id, issue.subject, issue.status.name, votes.value.length],
+            );
+
+            if (votes.value.length > 2) {
+                ready_issues.push(issue);
+            }
+        }
+    });
+
+    alert('List of issues in needs review status:');
+    console.log();
+    console.log(table.toString());
+
+    if (ready_issues.length) {
+        for (const issue in ready_issues) {
+            if (ready_issues[issue].id) {
+                const confirm_move_to_qa: any = await prompt({
+                    type   : 'confirm',
+                    name   : 'move',
+                    initial: true,
+                    message: `Do you to move card number ${ready_issues[issue].id} to QA?`,
+                });
+
+                if (confirm_move_to_qa.move) {
+                    alert(`Change status from ${ready_issues[issue].status.name} to QA...`, 'blue');
+                    await update_issue(ready_issues[issue].id, { issue: { status_id: 4 } });
+                    alert('Done', 'green');
+                } else {
+                    alert(`Card status stays in ${ready_issues[issue].status.name}`, 'blue');
+                }
+            }
+        }
+    } else {
+        console.log();
+        alert('You have no cards ready for QA', 'red', 'bold');
+        console.log();
+    }
+};
+
 export const issue = (program: any) => {
     program
         .command('issue')
         .description('Handle issue')
         .option('-i, --issue <issue>', 'Issue number')
+        .option('-mi, --my-issues', 'Check the status of my issues')
         .option('-s, --start', 'Start working on issue')
         .option('-ad, --add-vote', 'Add your vote to the issue')
+        .option('-cqa, --check-for-qa', 'Check if cards are reviewed and ready to move to the QA')
         .option('-pr, --review', 'Review PR of the issue')
         .action(async (options: any) => {
-            const issue: TIssue = await fetch_issue(options.issue, 'include=children,attachments,relations,changesets,journals,watchers,allowed_statuses');
+            let issue: TIssue;
+            if (options.issue) {
+                issue = await fetch_issue(options.issue, 'include=children,attachments,relations,changesets,journals,watchers,allowed_statuses');
+            }
 
-            if (!issue.data) {
-                alert('There is an issue with fetch the issue from redmine. Please try again.', 'red');
+            if ((options.start || options.review || options.addVote) && !options.issue) {
+                alert('Please provide a issue number by passing -i argument to Jarvis', 'red');
                 process.exit(1);
+            }
+
+            // List my issues
+            if (options.myIssues) {
+                await my_issues();
             }
 
             // Start the Issue
@@ -158,6 +240,11 @@ export const issue = (program: any) => {
             // Add vote to the issue
             if (options.addVote) {
                 await add_vote(options, issue);
+            }
+
+            // Check if cards are reviewed and ready to move to the QA
+            if (options.checkForQa) {
+                await check_for_qa();
             }
         });
 };
