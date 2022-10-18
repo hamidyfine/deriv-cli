@@ -124,7 +124,14 @@ const add_vote = async (options: any, issue: TIssue) => {
 const review_pr = async (options: any, issue: TIssue) => {
     const desc = issue.data.issue.description;
     const pr_link = desc.substring(desc.indexOf('https://github.com/binary-com/deriv-app/pull/'), desc.indexOf(']'));
-                
+    console.log('🚀 ~ file: issue.ts ~ line 127 ~ pr_link', pr_link);
+
+    const review = async () => {
+        alert(`PR Link: ${pr_link}`, 'blue');
+        alert('Opening PR link in the default browser...', 'blue');
+        await open(pr_link);
+    };
+
     if (!pr_link) {
         alert('The PR link is not added to the card description.', 'red');
         alert(`Card link: https://redmine.deriv.cloud/issues/${issue.data.issue.id}`);
@@ -138,10 +145,10 @@ const review_pr = async (options: any, issue: TIssue) => {
             message: 'Do you want to review the card?',
         });
         if (res.confirm_status && pr_link) {
-            alert(`PR Link: ${pr_link}`, 'blue');
-            alert('Opening PR link in the default browser...', 'blue');
-            await open(pr_link);
+            await review();
         }
+    } else {
+        await review();
     }
     const res: any = await prompt(add_vote_confirm);
     if (res.add_vote) {
