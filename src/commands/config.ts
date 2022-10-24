@@ -4,6 +4,7 @@
 import axios from 'axios';
 import { homedir } from 'os';
 import { prompt } from 'enquirer';
+import { existsSync } from 'fs';
 import { File } from 'fs-pro';
 import { alert } from '../utils';
 
@@ -40,6 +41,12 @@ export const config = (program: any) => {
         .action(async () => {
             const res: TResponse = await prompt(token);
             const file = new File(config_path().home, config_path().filename);
+            let commitLintConfig: any = null;
+            
+            if (existsSync(`${process.cwd()}/.commitlintrc.json`)) {
+                const commitLintConfigFile = new File(process.cwd(), '.commitlintrc.json');
+                commitLintConfig = JSON.parse(commitLintConfigFile.read().toString());
+            }
 
             const my_account = await axios('https://redmine.deriv.cloud/my/account.json', {
                 method : 'get',
@@ -51,11 +58,12 @@ export const config = (program: any) => {
 
             const content = {
                 ...res,
-                id       : my_account.data.user.id,
-                login    : my_account.data.user.login,
-                firstname: my_account.data.user.firstname,
-                lastname : my_account.data.user.lastname,
-                mail     : my_account.data.user.mail,
+                id          : my_account.data.user.id,
+                login       : my_account.data.user.login,
+                firstname   : my_account.data.user.firstname,
+                lastname    : my_account.data.user.lastname,
+                mail        : my_account.data.user.mail,
+                commit_types: commitLintConfig ? commitLintConfig.rules['type-enum'][2] : null,
             };
             file.write(JSON.stringify(content));
             alert('Jarvis configured successfully.', 'green');

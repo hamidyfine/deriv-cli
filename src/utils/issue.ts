@@ -61,3 +61,12 @@ export const find_in_custom_fields = (fields: TCustomField[], slug: string) => {
     });
     return slug_value;
 };
+
+export const clean_issue_subject = (subject: string) => {
+    if (!subject) {
+        alert('Please provide the subject', 'red');
+        process.exit(1);
+    }
+
+    return subject.substring(subject.indexOf('/') + 1).replace(/-/gi, ' ').replace(/Developer_name/gi, '').replace(/Task/gi, '');
+};

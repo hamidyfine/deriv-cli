@@ -4,7 +4,7 @@
 import { exec, alert } from '../utils';
 import { read_config } from './config';
 import { snakeCase } from 'change-case';
-import { fetch_issue } from '../utils/issue';
+import { fetch_issue, clean_issue_subject } from '../utils/issue';
 
 export const branch = (program: any) => {
     program
@@ -24,7 +24,7 @@ export const branch = (program: any) => {
                     alert(issue.error, 'red');
                     process.exit(1);
                 } else {
-                    const filter_title = issue.data.issue.subject.substring(issue.data.issue.subject.indexOf('/') + 1).replace(/-/gi, ' ').replace(/Developer_name/gi, '').replace(/Task/gi, '');
+                    const filter_title = clean_issue_subject(issue.data.issue.subject);
                     const issue_data = {
                         number: issue.data.issue.id,
                         title : snakeCase(filter_title),
