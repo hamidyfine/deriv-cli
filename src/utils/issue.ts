@@ -68,5 +68,5 @@ export const clean_issue_subject = (subject: string) => {
         process.exit(1);
     }
 
-    return subject.substring(subject.indexOf('/') + 1).replace(/-/gi, ' ').replace(/Developer_name/gi, '').replace(/Task/gi, '');
+    return subject.substring(subject.indexOf('/') + 1).replace(/-/gi, ' ').replace(/Developer_name/gi, '').replace(/Task/gi, '').trim();
 };
